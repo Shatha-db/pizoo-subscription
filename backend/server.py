@@ -430,6 +430,163 @@ async def get_subscription_status(current_user: dict = Depends(get_current_user)
     )
 
 
+@api_router.post("/profile/create")
+async def create_profile(request: ProfileCreateRequest, current_user: dict = Depends(get_current_user)):
+    # Check if profile already exists
+    existing_profile = await db.profiles.find_one({"user_id": current_user['id']}, {"_id": 0})
+    if existing_profile:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="الملف الشخصي موجود بالفعل"
+        )
+    
+    # Create profile
+    profile = Profile(
+        user_id=current_user['id'],
+        display_name=request.display_name,
+        bio=request.bio,
+        date_of_birth=request.date_of_birth,
+        gender=request.gender,
+        height=request.height,
+        looking_for=request.looking_for,
+        interests=request.interests,
+        location=request.location,
+        occupation=request.occupation,
+        education=request.education,
+        relationship_goals=request.relationship_goals,
+        smoking=request.smoking,
+        drinking=request.drinking,
+        has_children=request.has_children,
+        wants_children=request.wants_children,
+        languages=request.languages
+    )
+    
+    profile_dict = profile.model_dump()
+    profile_dict['created_at'] = profile_dict['created_at'].isoformat()
+    profile_dict['updated_at'] = profile_dict['updated_at'].isoformat()
+    
+    await db.profiles.insert_one(profile_dict)
+    
+    # Update user profile_completed status
+    await db.users.update_one(
+        {"id": current_user['id']},
+        {"$set": {"profile_completed": True}}
+    )
+    
+    return {"message": "تم إنشاء الملف الشخصي بنجاح", "profile": profile_dict}
+
+
+@api_router.get("/profile/me")
+async def get_my_profile(current_user: dict = Depends(get_current_user)):
+    profile = await db.profiles.find_one({"user_id": current_user['id']}, {"_id": 0})
+    
+    if not profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="الملف الشخصي غير موجود"
+        )
+    
+    return profile
+
+
+@api_router.put("/profile/update")
+async def update_profile(request: ProfileUpdateRequest, current_user: dict = Depends(get_current_user)):
+    profile = await db.profiles.find_one({"user_id": current_user['id']}, {"_id": 0})
+    
+    if not profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="الملف الشخصي غير موجود"
+        )
+    
+    # Update only provided fields
+    update_data = {k: v for k, v in request.model_dump().items() if v is not None}
+    update_data['updated_at'] = datetime.now(timezone.utc).isoformat()
+    
+    await db.profiles.update_one(
+        {"user_id": current_user['id']},
+        {"$set": update_data}
+    )
+    
+    return {"message": "تم تحديث الملف الشخصي بنجاح"}
+
+
+@api_router.post("/profile/photo/upload")
+async def upload_photo(request: PhotoUploadRequest, current_user: dict = Depends(get_current_user)):
+    profile = await db.profiles.find_one({"user_id": current_user['id']}, {"_id": 0})
+    
+    if not profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="الملف الشخصي غير موجود"
+        )
+    
+    # For now, store base64 data directly (in production, upload to cloud storage)
+    photos = profile.get('photos', [])
+    if len(photos) >= 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="الحد الأقصى 6 صور"
+        )
+    
+    photos.append(request.photo_data)
+    
+    await db.profiles.update_one(
+        {"user_id": current_user['id']},
+        {"$set": {"photos": photos, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {"message": "تم رفع الصورة بنجاح", "photo_count": len(photos)}
+
+
+@api_router.delete("/profile/photo/{index}")
+async def delete_photo(index: int, current_user: dict = Depends(get_current_user)):
+    profile = await db.profiles.find_one({"user_id": current_user['id']}, {"_id": 0})
+    
+    if not profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="الملف الشخصي غير موجود"
+        )
+    
+    photos = profile.get('photos', [])
+    if index < 0 or index >= len(photos):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="رقم الصورة غير صحيح"
+        )
+    
+    photos.pop(index)
+    
+    await db.profiles.update_one(
+        {"user_id": current_user['id']},
+        {"$set": {"photos": photos, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {"message": "تم حذف الصورة بنجاح"}
+
+
+@api_router.get("/profiles/discover")
+async def discover_profiles(current_user: dict = Depends(get_current_user), limit: int = 20):
+    # Get current user's profile
+    my_profile = await db.profiles.find_one({"user_id": current_user['id']}, {"_id": 0})
+    
+    if not my_profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="يجب إكمال ملفك الشخصي أولاً"
+        )
+    
+    # Get other profiles (exclude current user)
+    # In production, add more sophisticated filtering and matching algorithm
+    profiles = await db.profiles.find(
+        {"user_id": {"$ne": current_user['id']}},
+        {"_id": 0}
+    ).limit(limit).to_list(length=limit)
+    
+    return {"profiles": profiles}
+
+
 @api_router.get("/terms")
 async def get_terms():
     terms_content = """
