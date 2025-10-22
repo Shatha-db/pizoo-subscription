@@ -41,6 +41,7 @@ const ProfileSetup = () => {
   const [newLanguage, setNewLanguage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [locationLoading, setLocationLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
