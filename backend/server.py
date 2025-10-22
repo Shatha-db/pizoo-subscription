@@ -54,6 +54,33 @@ class User(BaseModel):
     subscription_status: str = "trial"  # trial, active, cancelled, expired
     terms_accepted: bool = False
     terms_accepted_at: Optional[datetime] = None
+    profile_completed: bool = False
+
+
+class Profile(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    display_name: str  # اسم العرض أو الاسم المستعار
+    bio: Optional[str] = None  # نبذة عن النفس
+    date_of_birth: Optional[str] = None
+    gender: Optional[str] = None  # male, female, other
+    height: Optional[int] = None  # بالسم
+    looking_for: Optional[str] = None  # ماذا يبحث عنه
+    interests: List[str] = []  # الهوايات
+    photos: List[str] = []  # قائمة روابط الصور
+    location: Optional[str] = None
+    occupation: Optional[str] = None
+    education: Optional[str] = None
+    relationship_goals: Optional[str] = None  # serious, casual, friendship
+    smoking: Optional[str] = None  # yes, no, sometimes
+    drinking: Optional[str] = None  # yes, no, sometimes
+    has_children: Optional[bool] = None
+    wants_children: Optional[bool] = None
+    languages: List[str] = []
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class Subscription(BaseModel):
