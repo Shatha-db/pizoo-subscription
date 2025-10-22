@@ -110,7 +110,7 @@ const Register = () => {
           <CardHeader>
             <CardTitle className="text-2xl text-center">إنشاء حساب جديد</CardTitle>
             <CardDescription className="text-center">
-              املأ البيانات للبدء في فترتك التجريبية المجانية
+              أدخل معلوماتك لإنشاء حسابك
             </CardDescription>
           </CardHeader>
           <CardContent>
