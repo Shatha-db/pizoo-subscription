@@ -75,7 +75,11 @@ class PaymentMethod(BaseModel):
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str
-    paypal_email: EmailStr
+    payment_type: str  # card, paypal, bank_transfer
+    card_last_four: Optional[str] = None
+    card_brand: Optional[str] = None  # visa, mastercard, etc
+    paypal_email: Optional[EmailStr] = None
+    bank_account_country: Optional[str] = None
     is_active: bool = True
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
