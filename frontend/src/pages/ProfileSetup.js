@@ -74,6 +74,54 @@ const ProfileSetup = () => {
     setLanguages(languages.filter(l => l !== language));
   };
 
+  const getLocation = () => {
+    setLocationLoading(true);
+    setError('');
+    
+    if (!navigator.geolocation) {
+      setError('المتصفح لا يدعم تحديد الموقع');
+      setLocationLoading(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        
+        try {
+          // Use Nominatim (OpenStreetMap) for reverse geocoding - Free!
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=ar`
+          );
+          const data = await response.json();
+          
+          // Get city and country
+          const city = data.address.city || data.address.town || data.address.village || data.address.state;
+          const country = data.address.country;
+          const locationStr = `${city}, ${country}`;
+          
+          setFormData(prev => ({ ...prev, location: locationStr }));
+        } catch (error) {
+          console.error('Error getting location name:', error);
+          // Fallback to coordinates
+          setFormData(prev => ({ ...prev, location: `${latitude.toFixed(2)}, ${longitude.toFixed(2)}` }));
+        } finally {
+          setLocationLoading(false);
+        }
+      },
+      (error) => {
+        console.error('Error getting location:', error);
+        setError('لم نتمكن من الحصول على موقعك. يرجى السماح بالوصول للموقع.');
+        setLocationLoading(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
+  };
+
   const handleSubmit = async () => {
     setError('');
 
