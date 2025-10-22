@@ -587,6 +587,90 @@ async def discover_profiles(current_user: dict = Depends(get_current_user), limi
     return {"profiles": profiles}
 
 
+@api_router.post("/seed/dummy-profiles")
+async def create_dummy_profiles():
+    """Create dummy profiles for testing - Remove in production!"""
+    
+    dummy_users = [
+        {
+            "id": f"dummy-user-{i}",
+            "name": name,
+            "email": f"dummy{i}@example.com",
+            "phone_number": f"+4178901234{i}",
+            "password_hash": "dummy_hash",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "trial_end_date": (datetime.now(timezone.utc) + timedelta(days=14)).isoformat(),
+            "subscription_status": "trial",
+            "terms_accepted": True,
+            "terms_accepted_at": datetime.now(timezone.utc).isoformat(),
+            "profile_completed": True
+        }
+        for i, name in enumerate([
+            "سارة", "محمد", "لينا", "أحمد", "نور", "يوسف", "ريم", "عمر",
+            "مريم", "خالد", "دانة", "فهد", "ليلى", "سلطان", "جود", "ماجد"
+        ])
+    ]
+    
+    dummy_profiles = [
+        {
+            "id": f"profile-{i}",
+            "user_id": f"dummy-user-{i}",
+            "display_name": profile['name'],
+            "bio": profile['bio'],
+            "date_of_birth": profile['dob'],
+            "gender": profile['gender'],
+            "height": profile['height'],
+            "looking_for": profile['looking_for'],
+            "interests": profile['interests'],
+            "location": profile['location'],
+            "occupation": profile['occupation'],
+            "education": profile['education'],
+            "relationship_goals": profile['goals'],
+            "smoking": "no",
+            "drinking": "no",
+            "has_children": False,
+            "wants_children": True,
+            "languages": ["العربية", "الإنجليزية"],
+            "photos": [],
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        for i, profile in enumerate([
+            {"name": "سارة", "bio": "أحب السفر والقراءة والمغامرات الجديدة ☕📚✈️", "dob": "1995-05-15", "gender": "female", "height": 165, "looking_for": "علاقة جدية", "interests": ["السفر", "القراءة", "التصوير", "الطبخ"], "location": "جدة، السعودية", "occupation": "مصممة جرافيك", "education": "بكالوريوس", "goals": "serious"},
+            {"name": "محمد", "bio": "رياضي ومهتم بالتكنولوجيا. أبحث عن شريكة حياة 💪🏋️", "dob": "1992-08-20", "gender": "male", "height": 180, "looking_for": "علاقة جدية", "interests": ["الرياضة", "التكنولوجيا", "السفر", "البرمجة"], "location": "الرياض، السعودية", "occupation": "مهندس برمجيات", "education": "ماجستير", "goals": "serious"},
+            {"name": "لينا", "bio": "طبيبة وأحب مساعدة الناس. أحب الهدوء والطبيعة 🌸🌿", "dob": "1994-03-10", "gender": "female", "height": 168, "looking_for": "صداقة أولاً", "interests": ["الطب", "الطبيعة", "اليوغا", "القراءة"], "location": "دبي، الإمارات", "occupation": "طبيبة", "education": "دكتوراه", "goals": "serious"},
+            {"name": "أحمد", "bio": "رائد أعمال ومحب للحياة والمغامرات 🚀💼", "dob": "1990-11-25", "gender": "male", "height": 178, "looking_for": "علاقة جدية", "interests": ["ريادة الأعمال", "السفر", "القراءة", "الرياضة"], "location": "أبوظبي، الإمارات", "occupation": "رائد أعمال", "education": "ماجستير", "goals": "serious"},
+            {"name": "نور", "bio": "معلمة ومهتمة بالفن والثقافة. أحب التعرف على أشخاص جدد 🎨📖", "dob": "1996-07-12", "gender": "female", "height": 162, "looking_for": "صداقة", "interests": ["الفن", "الثقافة", "الموسيقى", "التعليم"], "location": "الدوحة، قطر", "occupation": "معلمة", "education": "بكالوريوس", "goals": "friendship"},
+            {"name": "يوسف", "bio": "مصور فوتوغرافي أحب توثيق اللحظات الجميلة 📷✨", "dob": "1993-04-18", "gender": "male", "height": 175, "looking_for": "علاقة عابرة", "interests": ["التصوير", "السفر", "الفن", "الطبيعة"], "location": "الكويت، الكويت", "occupation": "مصور", "education": "بكالوريوس", "goals": "casual"},
+            {"name": "ريم", "bio": "كاتبة ومدونة. أحب القصص والمغامرات ✍️💭", "dob": "1997-09-30", "gender": "female", "height": 160, "looking_for": "صداقة أولاً", "interests": ["الكتابة", "القراءة", "السفر", "الثقافة"], "location": "بيروت، لبنان", "occupation": "كاتبة", "education": "بكالوريوس", "goals": "friendship"},
+            {"name": "عمر", "bio": "محامي ومهتم بالعدالة والقانون. أحب النقاشات العميقة ⚖️", "dob": "1991-12-05", "gender": "male", "height": 182, "looking_for": "علاقة جدية", "interests": ["القانون", "القراءة", "الشطرنج", "التاريخ"], "location": "القاهرة، مصر", "occupation": "محامي", "education": "ماجستير", "goals": "serious"},
+            {"name": "مريم", "bio": "مهندسة معمارية أحب التصميم والإبداع 🏗️🎨", "dob": "1995-06-22", "gender": "female", "height": 167, "looking_for": "علاقة جدية", "interests": ["الهندسة", "التصميم", "الفن", "السفر"], "location": "عمّان، الأردن", "occupation": "مهندسة معمارية", "education": "بكالوريوس", "goals": "serious"},
+            {"name": "خالد", "bio": "طيار ومحب للسماء والطيران ✈️☁️", "dob": "1989-02-14", "gender": "male", "height": 183, "looking_for": "علاقة جدية", "interests": ["الطيران", "السفر", "المغامرات", "الرياضة"], "location": "الرياض، السعودية", "occupation": "طيار", "education": "بكالوريوس", "goals": "serious"},
+            {"name": "دانة", "bio": "صيدلانية ومهتمة بالصحة والرياضة 💊🏃‍♀️", "dob": "1996-10-08", "gender": "female", "height": 164, "looking_for": "صداقة أولاً", "interests": ["الصحة", "الرياضة", "التغذية", "القراءة"], "location": "المنامة، البحرين", "occupation": "صيدلانية", "education": "بكالوريوس", "goals": "friendship"},
+            {"name": "فهد", "bio": "مدير تسويق ومحب للإبداع والابتكار 📊💡", "dob": "1992-03-28", "gender": "male", "height": 177, "looking_for": "علاقة عابرة", "interests": ["التسويق", "الإبداع", "التكنولوجيا", "السفر"], "location": "جدة، السعودية", "occupation": "مدير تسويق", "education": "ماجستير", "goals": "casual"},
+            {"name": "ليلى", "bio": "مترجمة وأحب اللغات والثقافات المختلفة 🌍📚", "dob": "1994-08-15", "gender": "female", "height": 163, "looking_for": "صداقة", "interests": ["اللغات", "الترجمة", "السفر", "الثقافة"], "location": "الدار البيضاء، المغرب", "occupation": "مترجمة", "education": "ماجستير", "goals": "friendship"},
+            {"name": "سلطان", "bio": "محلل مالي ومهتم بالاستثمار والأعمال 💰📈", "dob": "1990-05-20", "gender": "male", "height": 179, "looking_for": "علاقة جدية", "interests": ["المال", "الاستثمار", "القراءة", "الرياضة"], "location": "دبي، الإمارات", "occupation": "محلل مالي", "education": "ماجستير", "goals": "serious"},
+            {"name": "جود", "bio": "طالبة طب أحلم بمساعدة الناس وتغيير العالم 🩺💗", "dob": "1998-11-11", "gender": "female", "height": 161, "looking_for": "صداقة أولاً", "interests": ["الطب", "التطوع", "القراءة", "الموسيقى"], "location": "الرياض، السعودية", "occupation": "طالبة طب", "education": "بكالوريوس", "goals": "friendship"},
+            {"name": "ماجد", "bio": "مدرب رياضي ومحب للحياة الصحية 💪🏋️‍♂️", "dob": "1991-07-07", "gender": "male", "height": 181, "looking_for": "علاقة جدية", "interests": ["الرياضة", "اللياقة", "التغذية", "التحفيز"], "location": "أبوظبي، الإمارات", "occupation": "مدرب رياضي", "education": "بكالوريوس", "goals": "serious"}
+        ])
+    ]
+    
+    # Insert users and profiles
+    try:
+        await db.users.insert_many(dummy_users)
+        await db.profiles.insert_many(dummy_profiles)
+        return {
+            "message": "تم إنشاء البروفايلات الوهمية بنجاح",
+            "count": len(dummy_profiles)
+        }
+    except Exception as e:
+        # Profiles might already exist
+        return {
+            "message": "البروفايلات موجودة بالفعل أو حدث خطأ",
+            "error": str(e)
+        }
+
+
 @api_router.get("/terms")
 async def get_terms():
     terms_content = """
