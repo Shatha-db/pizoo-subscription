@@ -177,8 +177,36 @@ const Dashboard = () => {
           )}
         </div>
 
+        {/* Payment Warning */}
+        {subscription && subscription.status === 'trial' && paymentStatus && !paymentStatus.has_payment && (
+          <Card className="border-red-200 bg-red-50" data-testid="payment-warning">
+            <CardHeader>
+              <CardTitle className="text-red-900 flex items-center gap-2">
+                <AlertCircle className="w-5 h-5" />
+                تنبيه: يجب إضافة طريقة دفع
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <p className="text-gray-700">
+                  لم تقم بإضافة طريقة دفع بعد. لمتابعة استخدام الخدمة بعد انتهاء فترتك التجريبية في{' '}
+                  <strong className="text-red-600">{new Date(subscription.trial_end_date).toLocaleDateString('ar-SA')}</strong>
+                  ، يجب إضافة طريقة دفع.
+                </p>
+                <Button
+                  onClick={() => window.location.href = '/add-payment'}
+                  className="bg-red-600 hover:bg-red-700"
+                  data-testid="add-payment-button"
+                >
+                  أضف طريقة الدفع الآن
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Important Notice */}
-        {subscription && subscription.status === 'trial' && (
+        {subscription && subscription.status === 'trial' && paymentStatus && paymentStatus.has_payment && (
           <Card className="border-yellow-200 bg-yellow-50" data-testid="important-notice">
             <CardHeader>
               <CardTitle className="text-yellow-900">ملاحظة مهمة</CardTitle>
@@ -187,7 +215,7 @@ const Dashboard = () => {
               <div className="space-y-2 text-gray-700">
                 <p className="flex items-start gap-2">
                   <CheckCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-                  بعد انتهاء فترتك التجريبية في <strong>{new Date(subscription.trial_end_date).toLocaleDateString('ar-SA')}</strong>، سيتم خصم مبلغ <strong>396 CHF</strong> تلقائياً من حساب PayPal الخاص بك.
+                  بعد انتهاء فترتك التجريبية في <strong>{new Date(subscription.trial_end_date).toLocaleDateString('ar-SA')}</strong>، سيتم خصم مبلغ <strong>396 CHF</strong> تلقائياً من طريقة الدفع المسجلة.
                 </p>
                 <p className="flex items-start gap-2">
                   <CheckCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
