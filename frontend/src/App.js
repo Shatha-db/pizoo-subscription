@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Welcome from './pages/Welcome';
 import Dashboard from './pages/Dashboard';
 import Terms from './pages/Terms';
+import AddPayment from './pages/AddPayment';
 import { Toaster } from './components/ui/sonner';
 import './App.css';
 
