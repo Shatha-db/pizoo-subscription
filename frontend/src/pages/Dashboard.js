@@ -5,7 +5,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
-import { Calendar, CreditCard, User, LogOut, Clock, CheckCircle } from 'lucide-react';
+import { Calendar, CreditCard, User, LogOut, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
