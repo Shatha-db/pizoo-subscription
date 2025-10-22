@@ -241,31 +241,43 @@ const ProfileSetup = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="height">الطول (سم)</Label>
-                  <Input
-                    id="height"
-                    name="height"
-                    type="number"
-                    value={formData.height}
-                    onChange={handleChange}
-                    placeholder="170"
-                    data-testid="height-input"
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="height">الطول (سم)</Label>
+                <Input
+                  id="height"
+                  name="height"
+                  type="number"
+                  value={formData.height}
+                  onChange={handleChange}
+                  placeholder="170"
+                  data-testid="height-input"
+                />
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="location">الموقع</Label>
+              <div className="space-y-2">
+                <Label htmlFor="location">الموقع</Label>
+                <div className="flex gap-2">
                   <Input
                     id="location"
                     name="location"
                     value={formData.location}
                     onChange={handleChange}
-                    placeholder="المدينة، البلد"
+                    placeholder="سيتم تحديده تلقائياً"
+                    readOnly
                     data-testid="location-input"
                   />
+                  <Button 
+                    type="button" 
+                    onClick={getLocation} 
+                    disabled={locationLoading}
+                    className="whitespace-nowrap"
+                  >
+                    {locationLoading ? '...' : '📍 تحديد موقعي'}
+                  </Button>
                 </div>
+                <p className="text-xs text-gray-500">
+                  اضغط على الزر لتحديد موقعك تلقائياً (يساعد في إيجاد أشخاص قريبين منك)
+                </p>
               </div>
             </div>
           )}
