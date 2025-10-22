@@ -91,12 +91,6 @@ class RegisterRequest(BaseModel):
     email: EmailStr
     phone_number: str
     password: str
-    payment_type: str  # card, paypal
-    card_number: Optional[str] = None
-    card_holder_name: Optional[str] = None
-    card_expiry: Optional[str] = None
-    card_cvv: Optional[str] = None
-    paypal_email: Optional[EmailStr] = None
     terms_accepted: bool
 
 
