@@ -261,27 +261,16 @@ const ProfileSetup = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="location">الموقع</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="location"
-                    name="location"
-                    value={formData.location}
-                    onChange={handleChange}
-                    placeholder="سيتم تحديده تلقائياً"
-                    readOnly
-                    data-testid="location-input"
-                  />
-                  <Button 
-                    type="button" 
-                    onClick={getLocation} 
-                    disabled={locationLoading}
-                    className="whitespace-nowrap"
-                  >
-                    {locationLoading ? '...' : '📍 تحديد موقعي'}
-                  </Button>
-                </div>
+                <Input
+                  id="location"
+                  name="location"
+                  value={formData.location || (locationLoading ? 'جاري تحديد موقعك...' : 'لم يتم تحديد الموقع')}
+                  readOnly
+                  data-testid="location-input"
+                  className="bg-gray-50"
+                />
                 <p className="text-xs text-gray-500">
-                  اضغط على الزر لتحديد موقعك تلقائياً (يساعد في إيجاد أشخاص قريبين منك)
+                  📍 يتم تحديد موقعك تلقائياً لإيجاد أشخاص قريبين منك
                 </p>
               </div>
             </div>
