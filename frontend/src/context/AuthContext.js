@@ -54,12 +54,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (name, email, password, paypalEmail, termsAccepted) => {
+  const register = async (name, email, phoneNumber, password, paymentType, cardNumber, cardHolderName, cardExpiry, cardCvv, paypalEmail, termsAccepted) => {
     try {
       const response = await axios.post(`${API}/auth/register`, {
         name,
         email,
+        phone_number: phoneNumber,
         password,
+        payment_type: paymentType,
+        card_number: cardNumber,
+        card_holder_name: cardHolderName,
+        card_expiry: cardExpiry,
+        card_cvv: cardCvv,
         paypal_email: paypalEmail,
         terms_accepted: termsAccepted
       });
