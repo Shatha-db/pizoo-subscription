@@ -56,7 +56,7 @@ const Register = () => {
     setLoading(false);
 
     if (result.success) {
-      navigate('/welcome');
+      navigate('/profile/setup');
     } else {
       setError(result.error);
     }
