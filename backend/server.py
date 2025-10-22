@@ -277,6 +277,63 @@ async def get_profile(current_user: dict = Depends(get_current_user)):
     )
 
 
+class AddPaymentRequest(BaseModel):
+    payment_type: str  # card, paypal
+    card_number: Optional[str] = None
+    card_holder_name: Optional[str] = None
+    card_expiry: Optional[str] = None
+    card_cvv: Optional[str] = None
+    paypal_email: Optional[EmailStr] = None
+
+
+@api_router.post("/payment/add")
+async def add_payment_method(request: AddPaymentRequest, current_user: dict = Depends(get_current_user)):
+    # Check if payment method already exists
+    existing_payment = await db.payment_methods.find_one({"user_id": current_user['id']}, {"_id": 0})
+    
+    if existing_payment:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="طريقة دفع موجودة بالفعل"
+        )
+    
+    # Create payment method
+    payment_method_data = {
+        "user_id": current_user['id'],
+        "payment_type": request.payment_type,
+        "is_active": True
+    }
+    
+    if request.payment_type == "card" and request.card_number:
+        payment_method_data["card_last_four"] = request.card_number[-4:]
+        payment_method_data["card_brand"] = "visa"
+    elif request.payment_type == "paypal" and request.paypal_email:
+        payment_method_data["paypal_email"] = request.paypal_email
+    
+    payment_method = PaymentMethod(**payment_method_data)
+    payment_dict = payment_method.model_dump()
+    payment_dict['created_at'] = payment_dict['created_at'].isoformat()
+    
+    await db.payment_methods.insert_one(payment_dict)
+    
+    return {"message": "تم إضافة طريقة الدفع بنجاح"}
+
+
+@api_router.get("/payment/status")
+async def get_payment_status(current_user: dict = Depends(get_current_user)):
+    payment = await db.payment_methods.find_one({"user_id": current_user['id']}, {"_id": 0})
+    
+    if not payment:
+        return {"has_payment": False}
+    
+    return {
+        "has_payment": True,
+        "payment_type": payment.get('payment_type'),
+        "card_last_four": payment.get('card_last_four'),
+        "paypal_email": payment.get('paypal_email')
+    }
+
+
 @api_router.get("/subscription/status", response_model=SubscriptionStatus)
 async def get_subscription_status(current_user: dict = Depends(get_current_user)):
     subscription = await db.subscriptions.find_one({"user_id": current_user['id']}, {"_id": 0})
