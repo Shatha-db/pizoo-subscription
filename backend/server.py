@@ -209,26 +209,6 @@ async def register(request: RegisterRequest):
     
     await db.users.insert_one(user_dict)
     
-    # Create payment method based on type
-    payment_method_data = {
-        "user_id": user.id,
-        "payment_type": request.payment_type,
-        "is_active": True
-    }
-    
-    if request.payment_type == "card" and request.card_number:
-        # Store only last 4 digits for security
-        payment_method_data["card_last_four"] = request.card_number[-4:]
-        payment_method_data["card_brand"] = "visa"  # You can detect card brand from number
-    elif request.payment_type == "paypal" and request.paypal_email:
-        payment_method_data["paypal_email"] = request.paypal_email
-    
-    payment_method = PaymentMethod(**payment_method_data)
-    payment_dict = payment_method.model_dump()
-    payment_dict['created_at'] = payment_dict['created_at'].isoformat()
-    
-    await db.payment_methods.insert_one(payment_dict)
-    
     # Create subscription
     next_payment_date = trial_end_date
     subscription = Subscription(
