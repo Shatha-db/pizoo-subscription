@@ -43,6 +43,11 @@ const ProfileSetup = () => {
   const [loading, setLoading] = useState(false);
   const [locationLoading, setLocationLoading] = useState(false);
 
+  // طلب الموقع تلقائياً عند تحميل الصفحة
+  useEffect(() => {
+    getLocation();
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
