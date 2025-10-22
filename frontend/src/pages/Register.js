@@ -177,15 +177,6 @@ const Register = () => {
                 />
               </div>
 
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 my-4">
-                <p className="text-sm text-green-800 font-medium">
-                  ✅ لا حاجة لبطاقة ائتمان الآن
-                </p>
-                <p className="text-xs text-green-700 mt-1">
-                  ستتمكن من إضافة طريقة الدفع قبل انتهاء الفترة التجريبية
-                </p>
-              </div>
-
               {/* Terms and Conditions */}
               <div className="flex items-start gap-2 pt-2">
                 <Checkbox
