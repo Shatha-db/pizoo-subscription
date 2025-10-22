@@ -14,22 +14,27 @@ const API = `${BACKEND_URL}/api`;
 const Dashboard = () => {
   const { user, logout, token } = useAuth();
   const [subscription, setSubscription] = useState(null);
+  const [paymentStatus, setPaymentStatus] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchSubscription();
+    fetchData();
   }, []);
 
-  const fetchSubscription = async () => {
+  const fetchData = async () => {
     try {
-      const response = await axios.get(`${API}/subscription/status`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      setSubscription(response.data);
+      const [subResponse, payResponse] = await Promise.all([
+        axios.get(`${API}/subscription/status`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get(`${API}/payment/status`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      ]);
+      setSubscription(subResponse.data);
+      setPaymentStatus(payResponse.data);
     } catch (error) {
-      console.error('Error fetching subscription:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
