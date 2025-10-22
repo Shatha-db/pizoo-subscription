@@ -83,11 +83,11 @@ const Welcome = () => {
         <CardFooter className="flex justify-center">
           <Button
             size="lg"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/profile/setup')}
             className="gap-2"
-            data-testid="go-to-dashboard-button"
+            data-testid="go-to-profile-setup-button"
           >
-            الذهاب إلى لوحة التحكم
+            أكمل ملفك الشخصي الآن
             <ArrowRight className="w-4 h-4" />
           </Button>
         </CardFooter>
