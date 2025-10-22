@@ -46,6 +46,22 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/profile/setup"
+            element={
+              <ProtectedRoute>
+                <ProfileSetup />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/discover"
+            element={
+              <ProtectedRoute>
+                <Discover />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
         <Toaster />
       </BrowserRouter>
