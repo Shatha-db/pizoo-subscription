@@ -8,6 +8,8 @@ import Welcome from './pages/Welcome';
 import Dashboard from './pages/Dashboard';
 import Terms from './pages/Terms';
 import AddPayment from './pages/AddPayment';
+import ProfileSetup from './pages/ProfileSetup';
+import Discover from './pages/Discover';
 import { Toaster } from './components/ui/sonner';
 import './App.css';
 
