@@ -150,6 +150,48 @@ class SubscriptionStatus(BaseModel):
     currency: str
 
 
+class ProfileCreateRequest(BaseModel):
+    display_name: str
+    bio: Optional[str] = None
+    date_of_birth: Optional[str] = None
+    gender: Optional[str] = None
+    height: Optional[int] = None
+    looking_for: Optional[str] = None
+    interests: List[str] = []
+    location: Optional[str] = None
+    occupation: Optional[str] = None
+    education: Optional[str] = None
+    relationship_goals: Optional[str] = None
+    smoking: Optional[str] = None
+    drinking: Optional[str] = None
+    has_children: Optional[bool] = None
+    wants_children: Optional[bool] = None
+    languages: List[str] = []
+
+
+class ProfileUpdateRequest(BaseModel):
+    display_name: Optional[str] = None
+    bio: Optional[str] = None
+    date_of_birth: Optional[str] = None
+    gender: Optional[str] = None
+    height: Optional[int] = None
+    looking_for: Optional[str] = None
+    interests: Optional[List[str]] = None
+    location: Optional[str] = None
+    occupation: Optional[str] = None
+    education: Optional[str] = None
+    relationship_goals: Optional[str] = None
+    smoking: Optional[str] = None
+    drinking: Optional[str] = None
+    has_children: Optional[bool] = None
+    wants_children: Optional[bool] = None
+    languages: Optional[List[str]] = None
+
+
+class PhotoUploadRequest(BaseModel):
+    photo_data: str  # base64 encoded image
+
+
 # ===== Helper Functions =====
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
