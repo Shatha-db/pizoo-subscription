@@ -36,6 +36,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/add-payment"
+            element={
+              <ProtectedRoute>
+                <AddPayment />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
         <Toaster />
       </BrowserRouter>
