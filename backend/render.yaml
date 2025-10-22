@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: pizoo-subscription-backend
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn server:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DB_NAME
+        value: subscription_db
+      - key: CORS_ORIGINS
+        value: "*"
