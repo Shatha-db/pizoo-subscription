@@ -32,7 +32,7 @@ const Login = () => {
     setLoading(false);
 
     if (result.success) {
-      navigate('/dashboard');
+      navigate('/home');
     } else {
       setError(result.error);
     }
