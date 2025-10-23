@@ -218,6 +218,51 @@ const Home = () => {
         </div>
       )}
 
+      {/* New Likes Popup */}
+      {showNewLikesPopup && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="max-w-md w-full p-6 bg-gradient-to-br from-yellow-50 to-orange-50 border-4 border-yellow-400">
+            <div className="text-center">
+              <div className="text-6xl mb-4">💕</div>
+              <h2 className="text-2xl font-bold mb-2">
+                لديك {newLikesCount} إعجابات جديدة!
+              </h2>
+              <p className="text-gray-700 mb-6">
+                بعض الأشخاص معجبون بك. اكتشف من هم!
+              </p>
+              
+              <div className="flex gap-2 mb-4">
+                {[1, 2, 3, 4].slice(0, Math.min(newLikesCount, 4)).map((_, index) => (
+                  <div
+                    key={index}
+                    className="flex-1 aspect-square rounded-lg bg-gradient-to-br from-pink-300 to-purple-300 blur-sm"
+                  />
+                ))}
+              </div>
+
+              <Button
+                onClick={() => {
+                  handleDismissLikesPopup();
+                  navigate('/likes-you');
+                }}
+                className="w-full bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-500 text-black font-bold text-lg py-6 mb-3"
+              >
+                <Zap className="w-5 h-5 ml-2" />
+                انظر من أبدى إعجابه بك
+              </Button>
+              
+              <Button
+                onClick={handleDismissLikesPopup}
+                variant="ghost"
+                className="w-full"
+              >
+                ربما لاحقاً
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
       <BottomNav />
     </div>
   );
