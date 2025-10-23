@@ -27,14 +27,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/terms" element={<Terms />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/dashboard" element={<Navigate to="/home" replace />} />
           <Route
             path="/add-payment"
             element={
