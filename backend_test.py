@@ -128,15 +128,14 @@ class DatingAppTester:
     
     def test_user_login(self):
         """Test user login with existing credentials"""
-        if not self.user_id:
+        if not self.user_id or not self.test_email:
             self.log_result("User Login", False, "No user registered to test login")
             return False
         
         # Use the same credentials from registration
-        unique_id = str(uuid.uuid4())[:8]
         login_data = {
-            "email": f"testuser{unique_id}@example.com",
-            "password": "TestPassword123!"
+            "email": self.test_email,
+            "password": self.test_password
         }
         
         response = self.make_request("POST", "/auth/login", login_data)
