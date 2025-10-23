@@ -131,6 +131,30 @@ class Match(BaseModel):
     unmatched: bool = False
 
 
+class PremiumSubscription(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    tier: str  # free, gold, platinum
+    status: str  # active, expired, cancelled
+    start_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    end_date: Optional[datetime] = None
+    features: dict = Field(default_factory=lambda: {
+        "unlimited_likes": False,
+        "see_who_liked": False,
+        "unlimited_rewinds": False,
+        "super_likes_per_day": 1,
+        "boosts_per_month": 0,
+        "top_picks": False,
+        "read_receipts": False,
+        "profile_controls": False
+    })
+    auto_renew: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
 # ===== Request/Response Models =====
 
 class RegisterRequest(BaseModel):
