@@ -212,6 +212,11 @@ class PhotoUploadRequest(BaseModel):
     photo_data: str  # base64 encoded image
 
 
+class SwipeRequest(BaseModel):
+    swiped_user_id: str
+    action: str  # like, pass, super_like
+
+
 # ===== Helper Functions =====
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
