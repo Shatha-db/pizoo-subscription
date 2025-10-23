@@ -498,7 +498,9 @@ async def create_profile(request: ProfileCreateRequest, current_user: dict = Dep
         {"$set": {"profile_completed": True}}
     )
     
-    return {"message": "تم إنشاء الملف الشخصي بنجاح", "profile": profile_dict}
+    # Remove non-serializable fields from response
+    response_profile = {k: v for k, v in profile_dict.items() if k != '_id'}
+    return {"message": "تم إنشاء الملف الشخصي بنجاح", "profile": response_profile}
 
 
 @api_router.get("/profile/me")
