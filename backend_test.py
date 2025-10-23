@@ -88,11 +88,13 @@ class DatingAppTester:
         """Test user registration"""
         # Generate unique test data
         unique_id = str(uuid.uuid4())[:8]
+        self.test_email = f"testuser{unique_id}@example.com"
+        self.test_password = "TestPassword123!"
         test_data = {
             "name": f"Test User {unique_id}",
-            "email": f"testuser{unique_id}@example.com",
+            "email": self.test_email,
             "phone_number": f"+1234567{unique_id[:4]}",
-            "password": "TestPassword123!",
+            "password": self.test_password,
             "terms_accepted": True
         }
         
