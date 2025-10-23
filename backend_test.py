@@ -22,6 +22,8 @@ class DatingAppTester:
         self.user_id = None
         self.profile_id = None
         self.test_results = []
+        self.test_email = None
+        self.test_password = None
         
     def log_result(self, test_name, success, message, response_data=None):
         """Log test results"""
