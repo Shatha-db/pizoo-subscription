@@ -602,12 +602,133 @@ async def discover_profiles(current_user: dict = Depends(get_current_user), limi
             detail="يجب إكمال ملفك الشخصي أولاً"
         )
     
-    # Get other profiles (exclude current user)
-    # In production, add more sophisticated filtering and matching algorithm
+    # Get users already swiped
+    swiped = await db.swipes.find({"user_id": current_user['id']}, {"_id": 0, "swiped_user_id": 1}).to_list(length=1000)
+    swiped_ids = [s['swiped_user_id'] for s in swiped]
+    
+    # Get other profiles (exclude current user and already swiped)
     profiles = await db.profiles.find(
-        {"user_id": {"$ne": current_user['id']}},
+        {
+            "user_id": {"$ne": current_user['id'], "$nin": swiped_ids}
+        },
         {"_id": 0}
     ).limit(limit).to_list(length=limit)
+    
+    return {"profiles": profiles}
+
+
+@api_router.post("/swipe")
+async def swipe_action(request: SwipeRequest, current_user: dict = Depends(get_current_user)):
+    # Save swipe
+    swipe = Swipe(
+        user_id=current_user['id'],
+        swiped_user_id=request.swiped_user_id,
+        action=request.action
+    )
+    
+    swipe_dict = swipe.model_dump()
+    swipe_dict['created_at'] = swipe_dict['created_at'].isoformat()
+    
+    await db.swipes.insert_one(swipe_dict)
+    
+    # Check for match if action is like or super_like
+    is_match = False
+    if request.action in ['like', 'super_like']:
+        # Check if the other user also liked
+        other_swipe = await db.swipes.find_one({
+            "user_id": request.swiped_user_id,
+            "swiped_user_id": current_user['id'],
+            "action": {"$in": ['like', 'super_like']}
+        })
+        
+        if other_swipe:
+            # It's a match!
+            is_match = True
+            
+            # Check if match already exists
+            existing_match = await db.matches.find_one({
+                "$or": [
+                    {"user1_id": current_user['id'], "user2_id": request.swiped_user_id},
+                    {"user1_id": request.swiped_user_id, "user2_id": current_user['id']}
+                ]
+            })
+            
+            if not existing_match:
+                match = Match(
+                    user1_id=current_user['id'],
+                    user2_id=request.swiped_user_id
+                )
+                
+                match_dict = match.model_dump()
+                match_dict['matched_at'] = match_dict['matched_at'].isoformat()
+                
+                await db.matches.insert_one(match_dict)
+    
+    return {
+        "success": True,
+        "is_match": is_match,
+        "action": request.action
+    }
+
+
+@api_router.get("/matches")
+async def get_matches(current_user: dict = Depends(get_current_user)):
+    # Get all matches
+    matches = await db.matches.find({
+        "$or": [
+            {"user1_id": current_user['id']},
+            {"user2_id": current_user['id']}
+        ],
+        "unmatched": False
+    }, {"_id": 0}).to_list(length=100)
+    
+    # Get profiles for matches
+    match_profiles = []
+    for match in matches:
+        other_user_id = match['user2_id'] if match['user1_id'] == current_user['id'] else match['user1_id']
+        profile = await db.profiles.find_one({"user_id": other_user_id}, {"_id": 0})
+        if profile:
+            match_profiles.append({
+                "match_id": match['id'],
+                "matched_at": match['matched_at'],
+                "profile": profile
+            })
+    
+    return {"matches": match_profiles}
+
+
+@api_router.get("/likes/sent")
+async def get_sent_likes(current_user: dict = Depends(get_current_user)):
+    # Get users I liked
+    likes = await db.swipes.find({
+        "user_id": current_user['id'],
+        "action": {"$in": ['like', 'super_like']}
+    }, {"_id": 0}).to_list(length=100)
+    
+    # Get profiles
+    profiles = []
+    for like in likes:
+        profile = await db.profiles.find_one({"user_id": like['swiped_user_id']}, {"_id": 0})
+        if profile:
+            profiles.append(profile)
+    
+    return {"profiles": profiles}
+
+
+@api_router.get("/likes/received")
+async def get_received_likes(current_user: dict = Depends(get_current_user)):
+    # Get users who liked me
+    likes = await db.swipes.find({
+        "swiped_user_id": current_user['id'],
+        "action": {"$in": ['like', 'super_like']}
+    }, {"_id": 0}).to_list(length=100)
+    
+    # Get profiles
+    profiles = []
+    for like in likes:
+        profile = await db.profiles.find_one({"user_id": like['user_id']}, {"_id": 0})
+        if profile:
+            profiles.append(profile)
     
     return {"profiles": profiles}
 
