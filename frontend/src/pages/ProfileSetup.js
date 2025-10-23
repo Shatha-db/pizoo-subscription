@@ -147,7 +147,7 @@ const ProfileSetup = () => {
           Authorization: `Bearer ${token}`
         }
       });
-      navigate('/discover');
+      navigate('/home');
     } catch (error) {
       setError(error.response?.data?.detail || 'حدث خطأ أثناء إنشاء الملف');
     } finally {
