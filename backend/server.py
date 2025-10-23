@@ -111,6 +111,26 @@ class PaymentMethod(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
+class Swipe(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    swiped_user_id: str
+    action: str  # like, pass, super_like
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class Match(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user1_id: str
+    user2_id: str
+    matched_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    unmatched: bool = False
+
+
 # ===== Request/Response Models =====
 
 class RegisterRequest(BaseModel):
