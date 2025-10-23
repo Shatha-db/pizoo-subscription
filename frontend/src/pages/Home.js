@@ -38,6 +38,29 @@ const Home = () => {
     }
   };
 
+  const checkNewLikes = async () => {
+    try {
+      const response = await axios.get(`${API}/likes/received`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const likesCount = response.data.profiles?.length || 0;
+      
+      // Show popup if there are new likes (simulate new likes check)
+      const lastSeenCount = localStorage.getItem('lastSeenLikesCount') || 0;
+      if (likesCount > lastSeenCount && likesCount > 0) {
+        setNewLikesCount(likesCount);
+        setShowNewLikesPopup(true);
+      }
+    } catch (error) {
+      console.error('Error checking likes:', error);
+    }
+  };
+
+  const handleDismissLikesPopup = () => {
+    localStorage.setItem('lastSeenLikesCount', newLikesCount.toString());
+    setShowNewLikesPopup(false);
+  };
+
   const handleSwipe = async (action) => {
     if (!currentProfile) return;
     
