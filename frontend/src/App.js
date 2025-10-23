@@ -13,8 +13,10 @@ import Discover from './pages/Discover';
 import Home from './pages/Home';
 import Explore from './pages/Explore';
 import Likes from './pages/Likes';
+import LikesYou from './pages/LikesYou';
 import Matches from './pages/Matches';
 import Profile from './pages/Profile';
+import Premium from './pages/Premium';
 import { Toaster } from './components/ui/sonner';
 import './App.css';
 
