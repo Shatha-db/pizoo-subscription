@@ -11,7 +11,7 @@ const BottomNav = () => {
     { path: '/home', icon: Home, label: 'الرئيسية', emoji: '❤️‍🔥' },
     { path: '/explore', icon: Search, label: 'استكشاف', emoji: '🔍' },
     { path: '/likes', icon: Heart, label: 'إعجابات', emoji: '💕' },
-    { path: '/matches', icon: MessageCircle, label: 'محادثات', emoji: '💬' },
+    { path: '/chat', icon: MessageCircle, label: 'محادثات', emoji: '💬' },
     { path: '/profile', icon: User, label: 'الحساب', emoji: '👤' }
   ];
 
