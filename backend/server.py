@@ -1118,6 +1118,235 @@ async def get_premium_plans():
     }
 
 
+# ===== Chat & Messaging APIs =====
+
+@api_router.get("/conversations")
+async def get_conversations(current_user: dict = Depends(get_current_user)):
+    """Get all conversations for current user"""
+    matches = await db.matches.find(
+        {
+            "$or": [
+                {"user1_id": current_user['id']},
+                {"user2_id": current_user['id']}
+            ],
+            "unmatched": False
+        },
+        {"_id": 0}
+    ).to_list(length=None)
+    
+    conversations = []
+    for match in matches:
+        other_user_id = match['user2_id'] if match['user1_id'] == current_user['id'] else match['user1_id']
+        
+        # Get other user's profile
+        other_profile = await db.profiles.find_one({"user_id": other_user_id}, {"_id": 0})
+        other_user = await db.users.find_one({"id": other_user_id}, {"_id": 0})
+        
+        # Get last message
+        last_message = await db.messages.find_one(
+            {"match_id": match['id']},
+            {"_id": 0},
+            sort=[("created_at", -1)]
+        )
+        
+        # Count unread messages
+        unread_count = await db.messages.count_documents({
+            "match_id": match['id'],
+            "receiver_id": current_user['id'],
+            "status": {"$ne": "read"}
+        })
+        
+        conversations.append({
+            "match_id": match['id'],
+            "user": {
+                "id": other_user_id,
+                "name": other_user.get('name') if other_user else "Unknown",
+                "display_name": other_profile.get('display_name') if other_profile else "Unknown",
+                "photo": other_profile.get('photos', [None])[0] if other_profile else None,
+                "is_online": False  # TODO: implement online status
+            },
+            "last_message": {
+                "content": last_message.get('content') if last_message else None,
+                "created_at": last_message.get('created_at') if last_message else match['matched_at'],
+                "sender_id": last_message.get('sender_id') if last_message else None
+            },
+            "unread_count": unread_count,
+            "matched_at": match['matched_at']
+        })
+    
+    # Sort by last message time
+    conversations.sort(key=lambda x: x['last_message']['created_at'], reverse=True)
+    
+    return {"conversations": conversations}
+
+
+@api_router.get("/conversations/{match_id}/messages")
+async def get_messages(match_id: str, current_user: dict = Depends(get_current_user)):
+    """Get all messages for a conversation"""
+    # Verify match exists and user is part of it
+    match = await db.matches.find_one(
+        {
+            "id": match_id,
+            "$or": [
+                {"user1_id": current_user['id']},
+                {"user2_id": current_user['id']}
+            ]
+        },
+        {"_id": 0}
+    )
+    
+    if not match:
+        raise HTTPException(status_code=404, detail="Match not found")
+    
+    # Get messages
+    messages = await db.messages.find(
+        {"match_id": match_id},
+        {"_id": 0}
+    ).sort("created_at", 1).to_list(length=None)
+    
+    # Mark messages as read
+    await db.messages.update_many(
+        {
+            "match_id": match_id,
+            "receiver_id": current_user['id'],
+            "status": {"$ne": "read"}
+        },
+        {
+            "$set": {
+                "status": "read",
+                "read_at": datetime.now(timezone.utc).isoformat()
+            }
+        }
+    )
+    
+    return {"messages": messages}
+
+
+@api_router.post("/conversations/{match_id}/messages")
+async def send_message(
+    match_id: str,
+    content: str,
+    message_type: str = "text",
+    current_user: dict = Depends(get_current_user)
+):
+    """Send a message in a conversation"""
+    # Verify match exists
+    match = await db.matches.find_one(
+        {
+            "id": match_id,
+            "$or": [
+                {"user1_id": current_user['id']},
+                {"user2_id": current_user['id']}
+            ]
+        },
+        {"_id": 0}
+    )
+    
+    if not match:
+        raise HTTPException(status_code=404, detail="Match not found")
+    
+    # Determine receiver
+    receiver_id = match['user2_id'] if match['user1_id'] == current_user['id'] else match['user1_id']
+    
+    # Create message
+    message_data = {
+        "id": str(uuid.uuid4()),
+        "match_id": match_id,
+        "sender_id": current_user['id'],
+        "receiver_id": receiver_id,
+        "content": content,
+        "message_type": message_type,
+        "status": "sent",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "read_at": None
+    }
+    
+    await db.messages.insert_one(message_data)
+    
+    return {
+        "message": "Message sent successfully",
+        "data": message_data
+    }
+
+
+@api_router.post("/conversations/{match_id}/read-receipts")
+async def mark_as_read(match_id: str, current_user: dict = Depends(get_current_user)):
+    """Mark all messages in conversation as read"""
+    result = await db.messages.update_many(
+        {
+            "match_id": match_id,
+            "receiver_id": current_user['id'],
+            "status": {"$ne": "read"}
+        },
+        {
+            "$set": {
+                "status": "read",
+                "read_at": datetime.now(timezone.utc).isoformat()
+            }
+        }
+    )
+    
+    return {
+        "message": f"Marked {result.modified_count} messages as read"
+    }
+
+
+# ===== Settings APIs =====
+
+@api_router.get("/settings")
+async def get_settings(current_user: dict = Depends(get_current_user)):
+    """Get user settings"""
+    settings = await db.user_settings.find_one({"user_id": current_user['id']}, {"_id": 0})
+    
+    if not settings:
+        # Create default settings
+        settings_data = {
+            "id": str(uuid.uuid4()),
+            "user_id": current_user['id'],
+            "visibility_mode": "standard",
+            "incognito_enabled": False,
+            "verified_only_chat": False,
+            "send_read_receipts": True,
+            "allow_contacts_sync": False,
+            "auto_play_videos": True,
+            "show_activity_status": True,
+            "theme": "system",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.user_settings.insert_one(settings_data)
+        return settings_data
+    
+    return settings
+
+
+@api_router.put("/settings")
+async def update_settings(
+    settings_update: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update user settings"""
+    settings_update["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.user_settings.update_one(
+        {"user_id": current_user['id']},
+        {"$set": settings_update}
+    )
+    
+    if result.matched_count == 0:
+        # Create if doesn't exist
+        settings_data = {
+            "id": str(uuid.uuid4()),
+            "user_id": current_user['id'],
+            **settings_update,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.user_settings.insert_one(settings_data)
+        return {"message": "Settings created", "settings": settings_data}
+    
+    return {"message": "Settings updated successfully"}
+
+
 @api_router.get("/terms")
 async def get_terms():
     terms_content = """
