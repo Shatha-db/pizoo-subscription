@@ -11,14 +11,18 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const Home = () => {
+  const navigate = useNavigate();
   const { token } = useAuth();
   const [profiles, setProfiles] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showMatch, setShowMatch] = useState(false);
+  const [showNewLikesPopup, setShowNewLikesPopup] = useState(false);
+  const [newLikesCount, setNewLikesCount] = useState(0);
 
   useEffect(() => {
     fetchProfiles();
+    checkNewLikes();
   }, []);
 
   const fetchProfiles = async () => {
