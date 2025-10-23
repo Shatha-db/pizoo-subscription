@@ -15,8 +15,11 @@ import Explore from './pages/Explore';
 import Likes from './pages/Likes';
 import LikesYou from './pages/LikesYou';
 import Matches from './pages/Matches';
+import ChatList from './pages/ChatList';
+import ChatRoom from './pages/ChatRoom';
 import Profile from './pages/Profile';
 import Premium from './pages/Premium';
+import Settings from './pages/Settings';
 import { Toaster } from './components/ui/sonner';
 import './App.css';
 
