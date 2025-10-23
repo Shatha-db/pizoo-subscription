@@ -919,6 +919,159 @@ async def create_dummy_profiles():
         }
 
 
+# ===== Premium Subscription APIs =====
+
+@api_router.get("/premium/subscription")
+async def get_premium_subscription(current_user: dict = Depends(get_current_user)):
+    """Get user's current premium subscription status"""
+    subscription = await db.premium_subscriptions.find_one(
+        {"user_id": current_user['id']},
+        {"_id": 0}
+    )
+    
+    if not subscription:
+        # Return free tier
+        return {
+            "tier": "free",
+            "status": "active",
+            "features": {
+                "unlimited_likes": False,
+                "see_who_liked": False,
+                "unlimited_rewinds": False,
+                "super_likes_per_day": 1,
+                "boosts_per_month": 0,
+                "top_picks": False,
+                "read_receipts": False,
+                "profile_controls": False
+            }
+        }
+    
+    return subscription
+
+
+@api_router.post("/premium/subscribe")
+async def subscribe_premium(
+    tier: str,  # gold or platinum
+    duration: str,  # 1week, 1month, 3months, 6months, 1year
+    current_user: dict = Depends(get_current_user)
+):
+    """Subscribe to premium tier (Mock - no real payment)"""
+    
+    # Define features based on tier
+    if tier == "gold":
+        features = {
+            "unlimited_likes": True,
+            "see_who_liked": True,
+            "unlimited_rewinds": True,
+            "super_likes_per_day": 5,
+            "boosts_per_month": 1,
+            "top_picks": True,
+            "read_receipts": False,
+            "profile_controls": False
+        }
+    elif tier == "platinum":
+        features = {
+            "unlimited_likes": True,
+            "see_who_liked": True,
+            "unlimited_rewinds": True,
+            "super_likes_per_day": 10,
+            "boosts_per_month": 2,
+            "top_picks": True,
+            "read_receipts": True,
+            "profile_controls": True
+        }
+    else:
+        raise HTTPException(status_code=400, detail="Invalid tier")
+    
+    # Calculate end date based on duration
+    duration_map = {
+        "1week": 7,
+        "1month": 30,
+        "3months": 90,
+        "6months": 180,
+        "1year": 365
+    }
+    
+    days = duration_map.get(duration, 30)
+    end_date = datetime.now(timezone.utc) + timedelta(days=days)
+    
+    # Check if subscription exists
+    existing = await db.premium_subscriptions.find_one({"user_id": current_user['id']})
+    
+    subscription_data = {
+        "user_id": current_user['id'],
+        "tier": tier,
+        "status": "active",
+        "start_date": datetime.now(timezone.utc).isoformat(),
+        "end_date": end_date.isoformat(),
+        "features": features,
+        "auto_renew": False,
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    if existing:
+        await db.premium_subscriptions.update_one(
+            {"user_id": current_user['id']},
+            {"$set": subscription_data}
+        )
+    else:
+        subscription_data["id"] = str(uuid.uuid4())
+        subscription_data["created_at"] = datetime.now(timezone.utc).isoformat()
+        await db.premium_subscriptions.insert_one(subscription_data)
+    
+    return {
+        "message": f"تم الاشتراك في {tier.capitalize()} بنجاح!",
+        "subscription": subscription_data
+    }
+
+
+@api_router.get("/premium/plans")
+async def get_premium_plans():
+    """Get available premium plans and pricing (Mock prices)"""
+    return {
+        "plans": [
+            {
+                "tier": "gold",
+                "name": "Pizoo Gold",
+                "description": "افتح جميع المميزات الأساسية",
+                "features": [
+                    "إعجابات غير محدودة",
+                    "شاهد من أبدى إعجابه بك",
+                    "تراجعات غير محدودة",
+                    "5 Super Likes يومياً",
+                    "1 Boost شهرياً",
+                    "أفضل الاختيارات اليومية"
+                ],
+                "pricing": [
+                    {"duration": "1week", "price": 49.99, "currency": "SAR"},
+                    {"duration": "1month", "price": 149.99, "currency": "SAR"},
+                    {"duration": "3months", "price": 399.99, "currency": "SAR"},
+                    {"duration": "6months", "price": 699.99, "currency": "SAR"}
+                ]
+            },
+            {
+                "tier": "platinum",
+                "name": "Pizoo Platinum",
+                "description": "أفضل تجربة مواعدة",
+                "features": [
+                    "جميع مميزات Gold",
+                    "رسالة قبل المطابقة",
+                    "10 Super Likes يومياً",
+                    "2 Boost شهرياً",
+                    "إشعارات القراءة",
+                    "التحكم في الملف الشخصي"
+                ],
+                "pricing": [
+                    {"duration": "1week", "price": 79.99, "currency": "SAR"},
+                    {"duration": "1month", "price": 249.99, "currency": "SAR"},
+                    {"duration": "3months", "price": 649.99, "currency": "SAR"},
+                    {"duration": "6months", "price": 1199.99, "currency": "SAR"}
+                ]
+            }
+        ]
+    }
+
+
 @api_router.get("/terms")
 async def get_terms():
     terms_content = """
