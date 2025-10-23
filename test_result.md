@@ -107,75 +107,93 @@ user_problem_statement: "Complete remaining 10% of dating app Phase 1: Finalize 
 backend:
   - task: "User Authentication (Register/Login)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Authentication endpoints exist, need to test register and login flows"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Both register and login endpoints working correctly. Register creates user with JWT token, login authenticates with correct credentials. All authentication flows functional."
 
   - task: "Profile Discovery API"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "GET /api/profiles/discover endpoint exists, returns profiles for swiping"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Profile discovery API working correctly. Returns 10 profiles for swiping, excludes current user and already swiped profiles. Dummy profiles seeded successfully."
 
   - task: "Swipe Action API"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "POST /api/swipe endpoint for like/pass/super_like actions"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Swipe API working correctly. All actions (like, pass, super_like) processed successfully. Match detection logic functional."
 
   - task: "Matches API"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "GET /api/matches endpoint to retrieve user matches"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Matches API working correctly. Returns user matches with profile data. No matches found in test (expected for new user)."
 
   - task: "Likes Sent/Received API"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "GET /api/likes/sent and /api/likes/received endpoints"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Both sent and received likes APIs working correctly. Sent likes shows 2 profiles (from swipe tests), received likes empty (expected for new user)."
 
   - task: "Profile Create/Update API"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "POST /api/profile/create, PUT /api/profile/update, GET /api/profile/me endpoints"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: All profile APIs working correctly. Profile creation, retrieval, and update all functional. Fixed minor serialization issue in profile creation response."
 
 frontend:
   - task: "Home Page with Card Swipe"
