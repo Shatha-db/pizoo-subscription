@@ -94,6 +94,22 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/likes-you"
+            element={
+              <ProtectedRoute>
+                <LikesYou />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/premium"
+            element={
+              <ProtectedRoute>
+                <Premium />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
         <Toaster />
       </BrowserRouter>
