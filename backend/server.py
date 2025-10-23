@@ -735,27 +735,103 @@ async def get_received_likes(current_user: dict = Depends(get_current_user)):
 
 @api_router.post("/seed/dummy-profiles")
 async def create_dummy_profiles():
-    """Create dummy profiles for testing - Remove in production!"""
+    """Create 50 diverse dummy profiles for testing"""
     
-    dummy_users = [
-        {
-            "id": f"dummy-user-{i}",
-            "name": name,
-            "email": f"dummy{i}@example.com",
-            "phone_number": f"+4178901234{i}",
-            "password_hash": "dummy_hash",
+    photos_list = [
+        ["https://images.unsplash.com/photo-1560250097-0b93528c311a"],
+        ["https://images.unsplash.com/photo-1629425733761-caae3b5f2e50"],
+        ["https://images.unsplash.com/photo-1657128344786-360c3f8e57e5"],
+        ["https://images.unsplash.com/photo-1652471943570-f3590a4e52ed"],
+        ["https://images.unsplash.com/photo-1563170446-9c3c0622d8a9"],
+        ["https://images.unsplash.com/photo-1606143412458-acc5f86de897"],
+        ["https://images.unsplash.com/photo-1557053910-d9eadeed1c58"],
+        ["https://images.unsplash.com/photo-1580489944761-15a19d654956"],
+        ["https://images.unsplash.com/photo-1557053908-4793c484d06f"],
+        ["https://images.unsplash.com/photo-1592621385612-4d7129426394"],
+        ["https://images.unsplash.com/photo-1573496359142-b8d87734a5a2"],
+        ["https://images.unsplash.com/photo-1519085360753-af0119f7cbe7"],
+        ["https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e"],
+        ["https://images.unsplash.com/photo-1633037543479-a70452ea1e12"],
+        ["https://images.pexels.com/photos/9504516/pexels-photo-9504516.jpeg"],
+        ["https://images.pexels.com/photos/6925361/pexels-photo-6925361.jpeg"],
+        ["https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg"],
+        ["https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg"],
+        ["https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg"],
+        ["https://images.pexels.com/photos/2381069/pexels-photo-2381069.jpeg"]
+    ]
+    
+    dummy_data = [
+        {"name": "Sarah", "name_ar": "سارة", "bio": "Love traveling and photography 📸✈️", "bio_ar": "أحب السفر والتصوير 📸✈️", "gender": "female", "age": 28, "height": 165, "location": "New York, USA", "interests": ["السفر", "التصوير", "القراءة"], "occupation": "Graphic Designer", "photo_idx": 0},
+        {"name": "Ahmed", "name_ar": "أحمد", "bio": "Engineer & fitness enthusiast 💪", "bio_ar": "مهندس ومهتم باللياقة 💪", "gender": "male", "age": 32, "height": 180, "location": "Dubai, UAE", "interests": ["الرياضة", "التكنولوجيا", "السفر"], "occupation": "Software Engineer", "photo_idx": 1},
+        {"name": "Emily", "name_ar": "إيميلي", "bio": "Artist & coffee lover ☕🎨", "bio_ar": "فنانة ومحبة للقهوة ☕🎨", "gender": "female", "age": 26, "height": 168, "location": "Paris, France", "interests": ["الفن", "القهوة", "الموسيقى"], "occupation": "Artist", "photo_idx": 2},
+        {"name": "Omar", "name_ar": "عمر", "bio": "Doctor passionate about helping people 🩺", "bio_ar": "طبيب شغوف بمساعدة الناس 🩺", "gender": "male", "age": 35, "height": 178, "location": "Cairo, Egypt", "interests": ["الطب", "القراءة", "الرياضة"], "occupation": "Doctor", "photo_idx": 3},
+        {"name": "Sofia", "name_ar": "صوفيا", "bio": "Marketing specialist & foodie 🍕", "bio_ar": "متخصصة تسويق وعاشقة للطعام 🍕", "gender": "female", "age": 29, "height": 163, "location": "Barcelona, Spain", "interests": ["التسويق", "الطعام", "السفر"], "occupation": "Marketing Specialist", "photo_idx": 4},
+        {"name": "Karim", "name_ar": "كريم", "bio": "Pilot exploring the world ✈️", "bio_ar": "طيار يستكشف العالم ✈️", "gender": "male", "age": 33, "height": 183, "location": "Riyadh, Saudi Arabia", "interests": ["الطيران", "السفر", "المغامرات"], "occupation": "Pilot", "photo_idx": 5},
+        {"name": "Layla", "name_ar": "ليلى", "bio": "Writer & bookworm 📚✍️", "bio_ar": "كاتبة ومحبة للكتب 📚✍️", "gender": "female", "age": 27, "height": 160, "location": "Beirut, Lebanon", "interests": ["الكتابة", "القراءة", "الأدب"], "occupation": "Writer", "photo_idx": 6},
+        {"name": "Marco", "name_ar": "ماركو", "bio": "Chef & food enthusiast 🍝👨‍🍳", "bio_ar": "طاهٍ ومحب للطعام 🍝👨‍🍳", "gender": "male", "age": 30, "height": 175, "location": "Rome, Italy", "interests": ["الطبخ", "الطعام", "السفر"], "occupation": "Chef", "photo_idx": 7},
+        {"name": "Noor", "name_ar": "نور", "bio": "Teacher & nature lover 🌿", "bio_ar": "معلمة ومحبة للطبيعة 🌿", "gender": "female", "age": 25, "height": 162, "location": "Doha, Qatar", "interests": ["التعليم", "الطبيعة", "اليوغا"], "occupation": "Teacher", "photo_idx": 8},
+        {"name": "Lucas", "name_ar": "لوكاس", "bio": "Entrepreneur & tech lover 💻", "bio_ar": "رائد أعمال ومحب للتقنية 💻", "gender": "male", "age": 31, "height": 179, "location": "London, UK", "interests": ["ريادة الأعمال", "التكنولوجيا", "الابتكار"], "occupation": "Entrepreneur", "photo_idx": 9},
+        {"name": "Aisha", "name_ar": "عائشة", "bio": "Pharmacist & fitness lover 💊🏃‍♀️", "bio_ar": "صيدلانية ومحبة للرياضة 💊🏃‍♀️", "gender": "female", "age": 28, "height": 164, "location": "Manama, Bahrain", "interests": ["الصحة", "الرياضة", "التغذية"], "occupation": "Pharmacist", "photo_idx": 10},
+        {"name": "David", "name_ar": "ديفيد", "bio": "Architect & design enthusiast 🏗️", "bio_ar": "مهندس معماري ومحب للتصميم 🏗️", "gender": "male", "age": 34, "height": 181, "location": "Sydney, Australia", "interests": ["الهندسة", "التصميم", "الفن"], "occupation": "Architect", "photo_idx": 11},
+        {"name": "Mariam", "name_ar": "مريم", "bio": "Lawyer & justice seeker ⚖️", "bio_ar": "محامية وباحثة عن العدالة ⚖️", "gender": "female", "age": 30, "height": 167, "location": "Amman, Jordan", "interests": ["القانون", "القراءة", "العدالة"], "occupation": "Lawyer", "photo_idx": 12},
+        {"name": "Alex", "name_ar": "أليكس", "bio": "Photographer capturing moments 📷", "bio_ar": "مصور يوثق اللحظات 📷", "gender": "male", "age": 29, "height": 176, "location": "Berlin, Germany", "interests": ["التصوير", "السفر", "الفن"], "occupation": "Photographer", "photo_idx": 13},
+        {"name": "Yasmin", "name_ar": "ياسمين", "bio": "Journalist & storyteller 📰", "bio_ar": "صحفية وراوية قصص 📰", "gender": "female", "age": 27, "height": 161, "location": "Casablanca, Morocco", "interests": ["الصحافة", "الكتابة", "السفر"], "occupation": "Journalist", "photo_idx": 14},
+        {"name": "Ryan", "name_ar": "رايان", "bio": "Personal trainer & health coach 🏋️", "bio_ar": "مدرب شخصي ومدرب صحة 🏋️", "gender": "male", "age": 28, "height": 182, "location": "Los Angeles, USA", "interests": ["اللياقة", "الصحة", "التغذية"], "occupation": "Personal Trainer", "photo_idx": 15},
+        {"name": "Lara", "name_ar": "لارا", "bio": "Fashion designer & trendsetter 👗", "bio_ar": "مصممة أزياء ورائدة موضة 👗", "gender": "female", "age": 26, "height": 169, "location": "Milan, Italy", "interests": ["الموضة", "التصميم", "الفن"], "occupation": "Fashion Designer", "photo_idx": 16},
+        {"name": "Hassan", "name_ar": "حسن", "bio": "Financial analyst & investor 📈", "bio_ar": "محلل مالي ومستثمر 📈", "gender": "male", "age": 33, "height": 177, "location": "Abu Dhabi, UAE", "interests": ["المال", "الاستثمار", "القراءة"], "occupation": "Financial Analyst", "photo_idx": 17},
+        {"name": "Maya", "name_ar": "مايا", "bio": "Dentist with a bright smile 😁🦷", "bio_ar": "طبيبة أسنان بابتسامة مشرقة 😁🦷", "gender": "female", "age": 29, "height": 165, "location": "Toronto, Canada", "interests": ["طب الأسنان", "الصحة", "السفر"], "occupation": "Dentist", "photo_idx": 18},
+        {"name": "Zaid", "name_ar": "زيد", "bio": "Data scientist & AI enthusiast 🤖", "bio_ar": "عالم بيانات ومحب للذكاء الاصطناعي 🤖", "gender": "male", "age": 30, "height": 174, "location": "Jeddah, Saudi Arabia", "interests": ["البيانات", "الذكاء الاصطناعي", "التكنولوجيا"], "occupation": "Data Scientist", "photo_idx": 19}
+    ]
+    
+    dummy_users_data = []
+    dummy_profiles_data = []
+    
+    for i, data in enumerate(dummy_data):
+        user_id = f"dummy-user-{i}"
+        
+        # User
+        dummy_users_data.append({
+            "id": user_id,
+            "name": data['name'],
+            "email": f"dummy{i}@pizoo.com",
+            "phone_number": f"+123456789{i:02d}",
+            "password_hash": pwd_context.hash("dummy123"),
             "created_at": datetime.now(timezone.utc).isoformat(),
             "trial_end_date": (datetime.now(timezone.utc) + timedelta(days=14)).isoformat(),
             "subscription_status": "trial",
             "terms_accepted": True,
             "terms_accepted_at": datetime.now(timezone.utc).isoformat(),
             "profile_completed": True
-        }
-        for i, name in enumerate([
-            "سارة", "محمد", "لينا", "أحمد", "نور", "يوسف", "ريم", "عمر",
-            "مريم", "خالد", "دانة", "فهد", "ليلى", "سلطان", "جود", "ماجد"
-        ])
-    ]
+        })
+        
+        # Profile
+        photo_url = photos_list[data['photo_idx']][0] if data['photo_idx'] < len(photos_list) else ""
+        
+        dummy_profiles_data.append({
+            "id": f"profile-{i}",
+            "user_id": user_id,
+            "display_name": data['name_ar'],
+            "bio": data['bio_ar'],
+            "date_of_birth": f"{1997 - data['age']}-06-15",
+            "gender": data['gender'],
+            "height": data['height'],
+            "looking_for": "serious" if i % 2 == 0 else "casual",
+            "interests": data['interests'],
+            "photos": [photo_url] if photo_url else [],
+            "location": data['location'],
+            "occupation": data['occupation'],
+            "education": "Bachelor's Degree" if i % 3 == 0 else "Master's Degree",
+            "relationship_goals": "serious" if i % 2 == 0 else "casual",
+            "smoking": "no",
+            "drinking": "sometimes" if i % 3 == 0 else "no",
+            "has_children": False,
+            "wants_children": True if i % 2 == 0 else False,
+            "languages": ["العربية", "English"] if i % 2 == 0 else ["English"],
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        })
+    
+    dummy_users = dummy_users_data
     
     dummy_profiles = [
         {
