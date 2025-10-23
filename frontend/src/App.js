@@ -10,6 +10,11 @@ import Terms from './pages/Terms';
 import AddPayment from './pages/AddPayment';
 import ProfileSetup from './pages/ProfileSetup';
 import Discover from './pages/Discover';
+import Home from './pages/Home';
+import Explore from './pages/Explore';
+import Likes from './pages/Likes';
+import Matches from './pages/Matches';
+import Profile from './pages/Profile';
 import { Toaster } from './components/ui/sonner';
 import './App.css';
 
