@@ -155,6 +155,52 @@ class PremiumSubscription(BaseModel):
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
+class Message(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    match_id: str
+    sender_id: str
+    receiver_id: str
+    content: str
+    message_type: str = "text"  # text, gif, sticker, audio
+    status: str = "sent"  # sent, delivered, read
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    read_at: Optional[datetime] = None
+
+
+class Conversation(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    match_id: str
+    user1_id: str
+    user2_id: str
+    last_message: Optional[str] = None
+    last_message_at: Optional[datetime] = None
+    unread_count_user1: int = 0
+    unread_count_user2: int = 0
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class UserSettings(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    visibility_mode: str = "standard"  # standard, incognito
+    incognito_enabled: bool = False
+    verified_only_chat: bool = False
+    send_read_receipts: bool = True
+    allow_contacts_sync: bool = False
+    auto_play_videos: bool = True
+    show_activity_status: bool = True
+    theme: str = "system"  # system, light, dark
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
 # ===== Request/Response Models =====
 
 class RegisterRequest(BaseModel):
