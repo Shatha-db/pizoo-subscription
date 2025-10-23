@@ -345,16 +345,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Home Page with Card Swipe"
-    - "Explore Page"
-    - "Matches Page"
-    - "Likes Page"
-    - "Profile Page"
-    - "Bottom Navigation"
-    - "App.js Routing"
-  stuck_tasks: []
-  test_all: true
-  test_priority: "high_first"
+    - "Login Flow"
+  stuck_tasks: 
+    - "Login Flow"
+  test_all: false
+  test_priority: "stuck_first"
 
 agent_communication:
   - agent: "main"
